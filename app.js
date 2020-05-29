@@ -1,23 +1,20 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-const cTable = require('console.table');
-const employee = require("./emloyeeModel");
-const PORT = process.env.PORT || 8080;
+// const db = require("./db/model");
+require('console.table');
+// const employee = require("./emloyeeModel");
+
+//const PORT = process.env.PORT || 8080;
 const connection = mysql.createConnection({
     host: "localhost",
-
-    // Your port; if not 3306
-    port: PORT,
-
     // Your username
     user: "root",
-
     // Your password
     password: "root",
     database: "employee_DB"
 });
-
 connection.connect(function (err) {
+    console.log("error: ",err);
     if (err) throw err;
     mainMenu();
 });
@@ -25,7 +22,7 @@ connection.connect(function (err) {
 //inquirer promt questions
 const mainMenuQs = [
     {
-        name: "what_to_do",
+        name: "mainQuestion",
         type: "list",
         message: "What would you like to do?",
         choices: ["View Employees", "View Department", "View Roles", "Add Department", "Add Roles", "Add Employee", "Update Roles", "Update Manager",
@@ -34,14 +31,14 @@ const mainMenuQs = [
 ];
 const addDepartmentQ = [
     {
-        name: "addDepartment",
-        type: "input",
+        name: "addDepartmentQ",
+        type: "list",
         message: "What is the name of the department you would like to add?",
     }
 ];
 const addRoleQ = [
     {
-        name: "addDepartment",
+        name: "addRoleQ",
         type: "input",
         message: "What is the name of the role you would like to add?",
     }
@@ -61,19 +58,18 @@ const addEmployeeQs = [
 // function that acts as a main hub for menus
 function mainMenu() {
     inquirer
-        .prompt(mainMenuQs).then(function (answer) {
-            switch (answer) {
+        .prompt(mainMenuQs).then(function(answer) {
+            switch (answer.mainQuestion) {
 
                 case "View Employees":
-                    viewEmp();
+                    viewAll("employee");
                     break;
-
                 case "View Department":
-                    viewDep();
+                    viewAll("department");
                     break;
 
                 case "View Roles":
-                    viewRole();
+                    viewAll("role");
                     break;
 
                 case "Add Department":
@@ -123,15 +119,16 @@ function mainMenu() {
         });
 }
 
+// view employees & view departments & view roles
 
-// view employees
-viewEmp = () => SELECT first_name, last_name WHERE  
-FROM mytable;
-
-// view departments
-
-// view roles
-
+viewAll = (table) => {
+    connection.query(`SELECT * FROM ${table}`,(err, res) => {
+        if (err) throw err;
+        console.log("\n");
+        console.table(res);
+        mainMenu();
+    });
+}
 // add departments
 
 // add roles
@@ -150,3 +147,10 @@ FROM mytable;
 // delete employees
 
 // view total amount of salaries in specific department
+
+// viewEmp = async () => {
+//    const employees = await db.findAllEmployees();
+//    console.log("\n");
+//    console.table(employees);
+//    mainMenu();
+// }
