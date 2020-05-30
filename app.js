@@ -39,7 +39,7 @@ const addDepartmentQArr = [
 
 const addRoleQArr = [
     {
-        name: "addRoleQ",
+        name: "addRoleNameQ",
         type: "input",
         message: "What is the name of the role you would like to add?",
     },
@@ -52,6 +52,20 @@ const addRoleQArr = [
         name: "addRoleIdQ",
         type: "input",
         message: "What is the id number of the role you are adding?",
+        // validate: function(input) {
+        //     // Declare function as asynchronous, and save the done callback
+        //     var done = this.async();
+        //     // Do async stuff
+        //     setTimeout(function() {
+        //       if (typeof input !== "number") {
+        //         // Pass the return value in the done callback
+        //         done("You need to provide a number");
+        //         return;
+        //       }
+        //       // Pass the return value in the done callback
+        //       done(true);
+        //     }, 3000);
+        //   }
     }
 ];
 const addEmployeeQsArr = [
@@ -155,7 +169,7 @@ function addAll(addInfo) {
         case "Add Roles":
             inquirer.prompt(addRoleQArr).then(function (answer) {
                 console.log("Switch Case Add Roles answer: "+answer.addRoleQ)
-                addRole(answer.addRoleQ);
+                addRole(answer.addRoleNameQ, answer.addRoleSalaryQ, answer.addRoleIdQ);
             });
             break;
         case "Add Employee":
@@ -179,10 +193,10 @@ function addDep(answer) {
 }
 
 // add roles
-function addRole(answer) {
-    console.log("addRole Function answer: "+ answer)
+function addRole(answer1, answer2, answer3) {
+    console.log("addRole Function answers: "+ answer1, answer2, answer3)
     connection.query(
-        'INSERT INTO role SET ?',[{title: answer},{title: answer},{title: answer},{title: answer},], (err, res) => {
+        'INSERT INTO role SET ?,?,?',[{title: answer1},{salary: answer2},{department_id: answer3}], (err, res) => {
             if (err) throw err;
             console.log("\n");
             console.table(res);
