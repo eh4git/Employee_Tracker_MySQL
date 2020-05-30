@@ -183,12 +183,12 @@ function addAll(addInfo) {
         case "Add Employee":
             inquirer.prompt(addEmployeeQsArr).then(function (answer) {
                 console.log("add employee switch case anser: "+answer.addEmpManagerIdQ)
-                addEmp(answer.addEmpFirstNameQ, answer.addEmpLastNameQ, answer.addEmpRoleIdQ, answer.addEmpManagerIdQ);
+                addEmp(answer.addEmpFirstNameQ, answer.addEmpLastNameQ, answer.addEmpManagerIdQ);
             });
             break;
     };
 }
-
+//  answer.addEmpRoleIdQ,
 // add departments
 function addDep(answer) {
     console.log("addDep Function answer: "+answer);
@@ -213,10 +213,12 @@ function addRole(answer1, answer2, answer3) {
         });
 }
 // add employees
-function addEmp(answer1, answer2, answer3, answer4) {
-    console.log("addEmp Function answers: "+ answer1, answer2, answer3, answer4);
+function addEmp(answer1, answer2, answer4) {
+    console.log("addEmp Function answers: "+ answer1, answer2, answer4);
+    const employeeQuery = 'INSERT INTO employee SET ?,?,?,?'
+    employeeQuery += 'SELECT role_id FROM employee INNER JOIN department ON employee.role_id = department.id'
     connection.query(
-        'INSERT INTO employee SET ?,?,?,?',[{first_name: answer1},{last_name: answer2},{role_id: answer3},{manager_id: answer4}], (err, res) => {
+        employeeQuery,[{first_name: answer1},{last_name: answer2},{manager_id: answer4}], (err, res) => {
             if (err) throw err;
             console.log("\n");
             console.table(res);
