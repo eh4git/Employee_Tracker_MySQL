@@ -70,14 +70,24 @@ const addRoleQArr = [
 ];
 const addEmployeeQsArr = [
     {
-        name: "addEmpFirstQ",
+        name: "addEmpFirstNameQ",
         type: "input",
         message: "What is the first name of the Employee you would like to add?",
     },
     {
-        name: "addEmpLastQ",
+        name: "addEmpLastNameQ",
         type: "input",
         message: "What is the last name of the Employee you would like to add?",
+    },
+    {
+        name: "addEmpRoleIdQ",
+        type: "input",
+        message: "What is the role id of the Employee you would like to add?",
+    },
+    {
+        name: "addEmpManagerIdQ",
+        type: "input",
+        message: "What is the magager id for the Employee you would like to add?",
     }
 ];
 // function that acts as a main hub for menus
@@ -108,7 +118,7 @@ function mainMenu() {
                     break;
 
                 case "Add Employee":
-                    addEmp(answer);
+                    addAll(answer.mainQuestion);
                     break;
 
                 case "Update Roles":
@@ -162,19 +172,18 @@ function addAll(addInfo) {
     switch (addInfo) {
         case "Add Department":
             inquirer.prompt(addDepartmentQArr).then(function (answer) {
-               console.log("Switch Case Add department answer: "+answer.addDepNameQ)
                 addDep(answer.addDepNameQ);
             });
             break;
         case "Add Roles":
             inquirer.prompt(addRoleQArr).then(function (answer) {
-                console.log("Switch Case Add Roles answer: "+answer.addRoleQ)
                 addRole(answer.addRoleNameQ, answer.addRoleSalaryQ, answer.addRoleIdQ);
             });
             break;
         case "Add Employee":
             inquirer.prompt(addEmployeeQsArr).then(function (answer) {
-                addEmployee(answer);
+                console.log("add employee switch case anser: "+answer.addEmpManagerIdQ)
+                addEmp(answer.addEmpFirstNameQ, answer.addEmpLastNameQ, answer.addEmpRoleIdQ, answer.addEmpManagerIdQ);
             });
             break;
     };
@@ -182,7 +191,7 @@ function addAll(addInfo) {
 
 // add departments
 function addDep(answer) {
-    console.log("addDep Function answer: "+answer)
+    console.log("addDep Function answer: "+answer);
     connection.query(
         'INSERT INTO department SET ?',{name: answer}, (err, res) => {
             if (err) throw err;
@@ -194,26 +203,26 @@ function addDep(answer) {
 
 // add roles
 function addRole(answer1, answer2, answer3) {
-    console.log("addRole Function answers: "+ answer1, answer2, answer3)
+    console.log("addRole Function answers: "+ answer1, answer2, answer3);
     connection.query(
         'INSERT INTO role SET ?,?,?',[{title: answer1},{salary: answer2},{department_id: answer3}], (err, res) => {
             if (err) throw err;
             console.log("\n");
             console.table(res);
             mainMenu();
-        })
+        });
 }
-// // add employees
-// function addEmp(answer) {
-//     console.log(answer)
-//     connection.query(
-//         `INSERT INTO department (name) VALUES (${answer.addDepartmentQ})`, (err, res) => {
-//             if (err) throw err;
-//             console.log("\n");
-//             console.table(res);
-//             mainMenu();
-//         })
-// }
+// add employees
+function addEmp(answer1, answer2, answer3, answer4) {
+    console.log("addEmp Function answers: "+ answer1, answer2, answer3, answer4);
+    connection.query(
+        'INSERT INTO employee SET ?,?,?,?',[{first_name: answer1},{last_name: answer2},{role_id: answer3},{manager_id: answer4}], (err, res) => {
+            if (err) throw err;
+            console.log("\n");
+            console.table(res);
+            mainMenu();
+        });
+}
 //Bonus Functionallity Below
 //update manager
 
@@ -227,9 +236,3 @@ function addRole(answer1, answer2, answer3) {
 
 // view total amount of salaries in specific department
 
-// viewEmp = async () => {
-//    const employees = await db.findAllEmployees();
-//    console.log("\n");
-//    console.table(employees);
-//    mainMenu();
-// }
