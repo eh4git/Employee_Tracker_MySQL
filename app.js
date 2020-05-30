@@ -14,13 +14,13 @@ const connection = mysql.createConnection({
     database: "employee_DB"
 });
 connection.connect(function (err) {
-    console.log("error: ",err);
+    // console.log("error: ", err);
     if (err) throw err;
     mainMenu();
 });
 
 //inquirer promt questions
-const mainMenuQs = [
+const mainMenuQsArr = [
     {
         name: "mainQuestion",
         type: "list",
@@ -29,28 +29,39 @@ const mainMenuQs = [
             "View Employees by Manager", "Delete Department", "Delete Roles", "Delete Employee", "View Department Salary Budget", "Exit Program"]
     }
 ];
-const addDepartmentQ = [
+const addDepartmentQArr = [
     {
-        name: "addDepartmentQ",
-        type: "list",
+        name: "addDepNameQ",
+        type: "Input",
         message: "What is the name of the department you would like to add?",
     }
 ];
-const addRoleQ = [
+
+const addRoleQArr = [
     {
         name: "addRoleQ",
         type: "input",
         message: "What is the name of the role you would like to add?",
+    },
+    {
+        name: "addRoleSalaryQ",
+        type: "input",
+        message: "What is the salary of for the role you are adding?",
+    },
+    {
+        name: "addRoleIdQ",
+        type: "input",
+        message: "What is the id number of the role you are adding?",
     }
 ];
-const addEmployeeQs = [
+const addEmployeeQsArr = [
     {
-        name: "addDepartment",
+        name: "addEmpFirstQ",
         type: "input",
         message: "What is the first name of the Employee you would like to add?",
     },
     {
-        name: "addDepartment",
+        name: "addEmpLastQ",
         type: "input",
         message: "What is the last name of the Employee you would like to add?",
     }
@@ -58,12 +69,13 @@ const addEmployeeQs = [
 // function that acts as a main hub for menus
 function mainMenu() {
     inquirer
-        .prompt(mainMenuQs).then(function(answer) {
+        .prompt(mainMenuQsArr).then(function (answer) {
             switch (answer.mainQuestion) {
 
                 case "View Employees":
                     viewAll("employee");
                     break;
+
                 case "View Department":
                     viewAll("department");
                     break;
@@ -73,15 +85,16 @@ function mainMenu() {
                     break;
 
                 case "Add Department":
-                    addDep();
+                    // console.log(answer.mainQuestion)
+                    addAll(answer.mainQuestion);
                     break;
 
                 case "Add Roles":
-                    addRole();
+                    addAll(answer.mainQuestion);
                     break;
 
                 case "Add Employee":
-                    addEmp();
+                    addEmp(answer);
                     break;
 
                 case "Update Roles":
@@ -122,19 +135,71 @@ function mainMenu() {
 // view employees & view departments & view roles
 
 viewAll = (table) => {
-    connection.query(`SELECT * FROM ${table}`,(err, res) => {
+    connection.query(`SELECT * FROM ${table}`, (err, res) => {
         if (err) throw err;
         console.log("\n");
         console.table(res);
         mainMenu();
     });
 }
+function addAll(addInfo) {
+    // console.log("Inserting a new Department/Role/Employee...\n");
+    // console.log("addInfo: "+addInfo)
+    switch (addInfo) {
+        case "Add Department":
+            inquirer.prompt(addDepartmentQArr).then(function (answer) {
+               console.log("Switch Case Add department answer: "+answer.addDepNameQ)
+                addDep(answer.addDepNameQ);
+            });
+            break;
+        case "Add Roles":
+            inquirer.prompt(addRoleQArr).then(function (answer) {
+                console.log("Switch Case Add Roles answer: "+answer.addRoleQ)
+                addRole(answer.addRoleQ);
+            });
+            break;
+        case "Add Employee":
+            inquirer.prompt(addEmployeeQsArr).then(function (answer) {
+                addEmployee(answer);
+            });
+            break;
+    };
+}
+
 // add departments
+function addDep(answer) {
+    console.log("addDep Function answer: "+answer)
+    connection.query(
+        'INSERT INTO department SET ?',{name: answer}, (err, res) => {
+            if (err) throw err;
+            console.log("\n");
+            console.table(res);
+            mainMenu();
+        });
+}
 
 // add roles
-
-// add employees
-
+function addRole(answer) {
+    console.log("addRole Function answer: "+ answer)
+    connection.query(
+        'INSERT INTO role SET ?',[{title: answer},{title: answer},{title: answer},{title: answer},], (err, res) => {
+            if (err) throw err;
+            console.log("\n");
+            console.table(res);
+            mainMenu();
+        })
+}
+// // add employees
+// function addEmp(answer) {
+//     console.log(answer)
+//     connection.query(
+//         `INSERT INTO department (name) VALUES (${answer.addDepartmentQ})`, (err, res) => {
+//             if (err) throw err;
+//             console.log("\n");
+//             console.table(res);
+//             mainMenu();
+//         })
+// }
 //Bonus Functionallity Below
 //update manager
 
