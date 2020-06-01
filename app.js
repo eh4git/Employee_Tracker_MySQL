@@ -25,8 +25,7 @@ const mainMenuQsArr = [
         name: "mainQuestion",
         type: "list",
         message: "What would you like to do?",
-        choices: ["View Employees", "View Department", "View Roles", "Add Department", "Add Roles", "Add Employee", "Update Roles", "Update Manager",
-            "View Employees by Manager", "Delete Department", "Delete Roles", "Delete Employee", "View Department Salary Budget", "Exit Program"]
+        choices: ["View Employees", "View Department", "View Roles", "Add Department", "Add Roles", "Add Employee", "Update Roles", "Exit Program"]
     }
 ];
 const addDepartmentQArr = [
@@ -52,20 +51,6 @@ const addRoleQArr = [
         name: "addRoleIdQ",
         type: "input",
         message: "What is the id number of the role you are adding?",
-        // validate: function(input) {
-        //     // Declare function as asynchronous, and save the done callback
-        //     var done = this.async();
-        //     // Do async stuff
-        //     setTimeout(function() {
-        //       if (typeof input !== "number") {
-        //         // Pass the return value in the done callback
-        //         done("You need to provide a number");
-        //         return;
-        //       }
-        //       // Pass the return value in the done callback
-        //       done(true);
-        //     }, 3000);
-        //   }
     }
 ];
 const addEmployeeQsArr = [
@@ -90,6 +75,24 @@ const addEmployeeQsArr = [
         message: "What is the magager id for the Employee you would like to add?",
     }
 ];
+const updateRoleQs =
+    [
+        {
+            name: "updateRoleTitleQ",
+            type: "input",
+            message: "What is the new title for the role you are updating?",
+        },
+        {
+            name: "updateRolSalaryQ",
+            type: "input",
+            message: "What is the new salary for the role you are updating?",
+        },
+        {
+            name: "updateRoleDepIdQ",
+            type: "input",
+            message: "What is the new department id for the role you are updating?",
+        }
+    ];
 // function that acts as a main hub for menus
 function mainMenu() {
     inquirer
@@ -122,32 +125,32 @@ function mainMenu() {
                     break;
 
                 case "Update Roles":
-                    updateMan();
+                    updateRole();
                     break;
 
-                case "Update Manager":
-                    updateMan();
-                    break;
+                // case "Update Manager":
+                //     updateManager();
+                //     break;
 
-                case "View Employees by Manager":
-                    empMan();
-                    break;
+                // case "View Employees by Manager":
+                //     empMan();
+                //     break;
 
-                case "Delete Department":
-                    delDep();
-                    break;
+                // case "Delete Department":
+                //     delDep();
+                //     break;
 
-                case "Delete Roles":
-                    delRole();
-                    break;
+                // case "Delete Roles":
+                //     delRole();
+                //     break;
 
-                case "Delete Employee":
-                    delEmp();
-                    break;
+                // case "Delete Employee":
+                //     delEmp();
+                //     break;
 
-                case "View Department Salary Budget":
-                    depSalBudget();
-                    break;
+                // case "View Department Salary Budget":
+                //     depSalBudget();
+                //     break;
 
                 case "Exit Program":
                     connection.end();
@@ -182,7 +185,7 @@ function addAll(addInfo) {
             break;
         case "Add Employee":
             inquirer.prompt(addEmployeeQsArr).then(function (answer) {
-                console.log("add employee switch case anser: "+answer.addEmpManagerIdQ)
+                console.log("add employee switch case anser: " + answer.addEmpManagerIdQ)
                 addEmp(answer.addEmpFirstNameQ, answer.addEmpLastNameQ, answer.addEmpManagerIdQ);
             });
             break;
@@ -191,9 +194,9 @@ function addAll(addInfo) {
 //  answer.addEmpRoleIdQ,
 // add departments
 function addDep(answer) {
-    console.log("addDep Function answer: "+answer);
+    console.log("addDep Function answer: " + answer);
     connection.query(
-        'INSERT INTO department SET ?',{name: answer}, (err, res) => {
+        'INSERT INTO department SET ?', { name: answer }, (err, res) => {
             if (err) throw err;
             console.log("\n");
             console.table(res);
@@ -203,9 +206,9 @@ function addDep(answer) {
 
 // add roles
 function addRole(answer1, answer2, answer3) {
-    console.log("addRole Function answers: "+ answer1, answer2, answer3);
+    console.log("addRole Function answers: " + answer1, answer2, answer3);
     connection.query(
-        'INSERT INTO role SET ?,?,?',[{title: answer1},{salary: answer2},{department_id: answer3}], (err, res) => {
+        'INSERT INTO role SET ?,?,?', [{ title: answer1 }, { salary: answer2 }, { department_id: answer3 }], (err, res) => {
             if (err) throw err;
             console.log("\n");
             console.table(res);
@@ -213,18 +216,55 @@ function addRole(answer1, answer2, answer3) {
         });
 }
 // add employees
-function addEmp(answer1, answer2, answer4) {
-    console.log("addEmp Function answers: "+ answer1, answer2, answer4);
+function addEmp(answer1, answer2, answer3, answer4) {
+    console.log("addEmp Function answers: " + answer1, answer2, answer4);
     const employeeQuery = 'INSERT INTO employee SET ?,?,?,?'
-    employeeQuery += 'SELECT role_id FROM employee INNER JOIN department ON employee.role_id = department.id'
     connection.query(
-        employeeQuery,[{first_name: answer1},{last_name: answer2},{manager_id: answer4}], (err, res) => {
+        employeeQuery, [{ first_name: answer1 }, { last_name: answer2 }, { role_id: answer3 }, { manager_id: answer4 }], (err, res) => {
             if (err) throw err;
             console.log("\n");
             console.table(res);
             mainMenu();
         });
 }
+
+function updateRole() {
+    connection.query("SELECT * FROM role", function (err, req) {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: "updateRoleSelectQ",
+                type: "list",
+                message: "What role would you like to update?",
+                choices: function () {
+                    const updateRoleChoices = [];
+                    for (let i = 0; i < req.length; i++) {
+                        updateRoleChoices.push(req[i].title);
+                    }
+                    console.log("updateRoleChoices: "+updateRoleChoices)
+                    return updateRoleChoices;
+                }
+            }
+        ])
+            .then(function (answer) {
+                let role = answer.updateRoleSelectQ;
+                console.log("update role .then answer: " + answer.updateRoleSelectQ)
+                inquirer.prompt(updateRoleQs).then(function (answer) {
+                    connection.query("UPDATE role SET title = ?, salary = ?, department_id = ? WHERE title = ?", [answer.updateRoleTitleQ, answer.updateRolSalaryQ, answer.updateRoleDepIdQ, role], function (err, res) {
+                        if (err) throw err;
+                        console.log("\n");
+                        console.table(res);
+                        mainMenu();
+                    });
+                });
+            });
+    });
+}
+
+
+
+
+
 //Bonus Functionallity Below
 //update manager
 
