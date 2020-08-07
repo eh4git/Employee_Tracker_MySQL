@@ -13,6 +13,9 @@
   * [Github Email](#Github_Email)
 ### Description
 In this application I have provided the user with the ability to track, update, and edit employee information. By using a command line interface the user can select from a list of options to view employees, roles, or departments. The user can also add roles, departments, and employees to the database. Roles can be edited to change the title or salary of a specified role. All information is saved in a SQL database using CRUD operations.
+
+![Screen Shot of project](demo.gif)
+
 ### Installation
 Follow the steps below to install the required node packages.<br>
 All dependencies listed in package.json. In your terminal enter: npm i
