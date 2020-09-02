@@ -20,6 +20,7 @@ In this application I have provided the user with the ability to track, update, 
 Follow the steps below to install the required node packages.<br>
 All dependencies listed in package.json. In your terminal enter: npm i
 ### Usage
+Deployed link: This application is designed for use within a CLI and does not have a deployed link <br>
 Enter either npm start or node app into your command line terminal.
 ### Licence
 This project uses the following licence(s):<br>
